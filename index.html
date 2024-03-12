@@ -1,6 +1,20 @@
 <canvas id="canvas" width="500" height="500"></canvas>
 
-<select id="colorSelect">
+<select id="colorSelect1">
+  <option value="red">Red</option>
+  <option value="green">Green</option>
+  <option value="blue">Blue</option>
+  <option value="transparent">Transparent</option>
+</select>
+
+<select id="colorSelect2">
+  <option value="red">Red</option>
+  <option value="green">Green</option>
+  <option value="blue">Blue</option>
+  <option value="transparent">Transparent</option>
+</select>
+
+<select id="colorSelect3">
   <option value="red">Red</option>
   <option value="green">Green</option>
   <option value="blue">Blue</option>
@@ -12,72 +26,97 @@
   var ctx = canvas.getContext('2d');
 
   var image1 = new Image();
-  var image2 = new Image();
+  var image2 = new Image(); 
+  var image3 = new Image(); // For vertical_crack
+  var image4 = new Image(); // For diagonal_crack
 
-  var selectedColor = 'red'; // Default color selection
+  var selectedColor1 = 'red'; // Horizontal crack
+  var selectedColor2 = 'red'; // Vertical crack
+  var selectedColor3 = 'red'; // Diagonal crack
 
   image1.onload = function() {
     ctx.drawImage(image1, 0, 0, 500, 500);
-    image2.src = '3masks/horizontal_crack_mask.png'; // Make sure this is loaded after the first image
+    image2.src = '3masks/horizontal_crack_mask.png'; 
+    image3.src = '3masks/vertical_crack_mask.png'; 
+    image4.src = '3masks/diagonal_crack_mask.png'; 
   };
 
-  image2.onload = function() {
-    <!-- ctx.drawImage(image2, 0, 0, 500, 500); -->
-    changeCrackColor(selectedColor); // Apply default color
+  image2.onload = image3.onload = image4.onload = function() {
+    changeCrackColors(); 
   };
 
   image1.src = 'raw/S1078754.JPG';
 
-  document.getElementById('colorSelect').addEventListener('change', function() {
-    selectedColor = this.value;
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-    ctx.drawImage(image1, 0, 0, 500, 500); // Redraw the original image
-    changeCrackColor(selectedColor);
+  document.getElementById('colorSelect1').addEventListener('change', function() {
+    selectedColor1 = this.value;
+    changeCrackColors();
   });
 
-  function changeCrackColor(color) {
+  document.getElementById('colorSelect2').addEventListener('change', function() {
+    selectedColor2 = this.value;
+    changeCrackColors();
+  });
+
+  document.getElementById('colorSelect3').addEventListener('change', function() {
+    selectedColor3 = this.value;
+    changeCrackColors();
+  });
+
+  function changeCrackColors() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    ctx.drawImage(image1, 0, 0, 500, 500); 
+
+    applyCrackColor(image2, selectedColor1); 
+    applyCrackColor(image3, selectedColor2); 
+    applyCrackColor(image4, selectedColor3); 
+  }
+
+  function applyCrackColor(image, color) {
     var tempCanvas = document.createElement('canvas');
     var tempCtx = tempCanvas.getContext('2d');
-
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
 
-    // Draw the image2 on the temporary canvas
-    tempCtx.drawImage(image2, 0, 0, 500, 500);
-
+    tempCtx.drawImage(image, 0, 0, 500, 500);
     var imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
     var data = imageData.data;
 
     for (var i = 0; i < data.length; i += 4) {
-        if (data[i] == 255 && data[i + 1] == 0 && data[i + 2] == 0) { // Check for red pixels
-            switch (color) {
-                case 'red':
-                    data[i] = 255;
-                    data[i + 1] = 0;
-                    data[i + 2] = 0;
-                    break;
-                case 'green':
-                    data[i] = 0;
-                    data[i + 1] = 255;
-                    data[i + 2] = 0;
-                    break;
-                case 'blue':
-                    data[i] = 0;
-                    data[i + 1] = 0;
-                    data[i + 2] = 255;
-                    break;
-                case 'transparent':
-                    data[i + 3] = 0; // Set alpha channel to fully transparent
-                    break;
-            }
+      // Find the red pixels as mask indicators
+      if (data[i] == 255 && data[i + 1] == 0 && data[i + 2] == 0) { 
+        switch (color) {
+          case 'red':
+              data[i] = 255;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+              break;
+          case 'green':
+              data[i] = 0;
+              data[i + 1] = 255;
+              data[i + 2] = 0;
+              break;
+          case 'blue':
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 255;
+              break;
+          case 'transparent':
+              data[i + 3] = 0; // Set alpha channel to fully transparent
+              break;
         }
+      }
     }
 
-    // Blend modified imageData with existing canvas content while preserving alpha
+    // Blend with the canvas
+    blendImageData(imageData); 
+  }
+
+  function blendImageData(imageData) {
+    var data = imageData.data; 
     for (var i = 0; i < data.length; i += 4) {
-      var alpha = data[i + 3] / 255.0; // Normalize alpha value
+      var alpha = data[i + 3] / 255.0; 
       ctx.fillStyle = `rgba(${data[i]}, ${data[i + 1]}, ${data[i + 2]}, ${alpha})`;
       ctx.fillRect(i / 4 % canvas.width, Math.floor(i / (4 * canvas.width)), 1, 1);
+    }
   }
-}
 </script>
