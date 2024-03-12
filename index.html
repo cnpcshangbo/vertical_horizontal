@@ -1,5 +1,12 @@
 <canvas id="canvas" width="500" height="500"></canvas>
 
+<select id="colorSelect">
+  <option value="red">Red</option>
+  <option value="green">Green</option>
+  <option value="blue">Blue</option>
+  <option value="transparent">Transparent</option>
+</select>
+
 <script>
   var canvas = document.getElementById('canvas');
   var ctx = canvas.getContext('2d');
@@ -7,14 +14,70 @@
   var image1 = new Image();
   var image2 = new Image();
 
+  var selectedColor = 'red'; // Default color selection
+
   image1.onload = function() {
     ctx.drawImage(image1, 0, 0, 500, 500);
     image2.src = '3masks/horizontal_crack_mask.png'; // Make sure this is loaded after the first image
   };
 
   image2.onload = function() {
-    ctx.drawImage(image2, 0, 0, 500, 500);
+    <!-- ctx.drawImage(image2, 0, 0, 500, 500); -->
+    changeCrackColor(selectedColor); // Apply default color
   };
 
   image1.src = 'raw/S1078754.JPG';
+
+  document.getElementById('colorSelect').addEventListener('change', function() {
+    selectedColor = this.value;
+    ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.drawImage(image1, 0, 0, 500, 500); // Redraw the original image
+    changeCrackColor(selectedColor);
+  });
+
+  function changeCrackColor(color) {
+    var tempCanvas = document.createElement('canvas');
+    var tempCtx = tempCanvas.getContext('2d');
+
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+
+    // Draw the image2 on the temporary canvas
+    tempCtx.drawImage(image2, 0, 0, 500, 500);
+
+    var imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+    var data = imageData.data;
+
+    for (var i = 0; i < data.length; i += 4) {
+        if (data[i] == 255 && data[i + 1] == 0 && data[i + 2] == 0) { // Check for red pixels
+            switch (color) {
+                case 'red':
+                    data[i] = 255;
+                    data[i + 1] = 0;
+                    data[i + 2] = 0;
+                    break;
+                case 'green':
+                    data[i] = 0;
+                    data[i + 1] = 255;
+                    data[i + 2] = 0;
+                    break;
+                case 'blue':
+                    data[i] = 0;
+                    data[i + 1] = 0;
+                    data[i + 2] = 255;
+                    break;
+                case 'transparent':
+                    data[i + 3] = 0; // Set alpha channel to fully transparent
+                    break;
+            }
+        }
+    }
+
+    // Blend modified imageData with existing canvas content while preserving alpha
+    for (var i = 0; i < data.length; i += 4) {
+      var alpha = data[i + 3] / 255.0; // Normalize alpha value
+      ctx.fillStyle = `rgba(${data[i]}, ${data[i + 1]}, ${data[i + 2]}, ${alpha})`;
+      ctx.fillRect(i / 4 % canvas.width, Math.floor(i / (4 * canvas.width)), 1, 1);
+  }
+}
 </script>
