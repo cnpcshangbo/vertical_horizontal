@@ -1,25 +1,40 @@
 <canvas id="canvas" width="500" height="500"></canvas>
 
-<select id="colorSelect1">
-  <option value="red">Red</option>
-  <option value="green">Green</option>
-  <option value="blue">Blue</option>
-  <option value="transparent">Transparent</option>
-</select>
+<div> 
+  <b>Horizontal Cracks: </b>
+  <input type="radio" id="colorSelect1Red" name="colorSelect1" value="red" checked>
+  <label for="colorSelect1Red">Red</label>
+  <input type="radio" id="colorSelect1Green" name="colorSelect1" value="green">
+  <label for="colorSelect1Green">Green</label>
+  <input type="radio" id="colorSelect1Blue" name="colorSelect1" value="blue">
+  <label for="colorSelect1Blue">Blue</label>
+  <input type="radio" id="colorSelect1Transparent" name="colorSelect1" value="transparent">
+  <label for="colorSelect1Transparent">Transparent</label>
+</div>
 
-<select id="colorSelect2">
-  <option value="red">Red</option>
-  <option value="green">Green</option>
-  <option value="blue">Blue</option>
-  <option value="transparent">Transparent</option>
-</select>
+<div>
+  <b>Vertical Cracks: </b> 
+  <input type="radio" id="colorSelect2Red" name="colorSelect2" value="red" checked>
+  <label for="colorSelect2Red">Red</label>
+  <input type="radio" id="colorSelect2Green" name="colorSelect2" value="green">
+  <label for="colorSelect2Green">Green</label>
+  <input type="radio" id="colorSelect2Blue" name="colorSelect2" value="blue">
+  <label for="colorSelect2Blue">Blue</label>
+  <input type="radio" id="colorSelect2Transparent" name="colorSelect2" value="transparent">
+  <label for="colorSelect2Transparent">Transparent</label>
+</div>
 
-<select id="colorSelect3">
-  <option value="red">Red</option>
-  <option value="green">Green</option>
-  <option value="blue">Blue</option>
-  <option value="transparent">Transparent</option>
-</select>
+<div>
+  <b>Diagonal Cracks: </b> 
+  <input type="radio" id="colorSelect3Red" name="colorSelect3" value="red" checked>
+  <label for="colorSelect3Red">Red</label>
+  <input type="radio" id="colorSelect3Green" name="colorSelect3" value="green">
+  <label for="colorSelect3Green">Green</label>
+  <input type="radio" id="colorSelect3Blue" name="colorSelect3" value="blue">
+  <label for="colorSelect3Blue">Blue</label>
+  <input type="radio" id="colorSelect3Transparent" name="colorSelect3" value="transparent">
+  <label for="colorSelect3Transparent">Transparent</label>
+</div>
 
 <script>
   var canvas = document.getElementById('canvas');
@@ -47,22 +62,21 @@
 
   image1.src = 'raw/S1078754.JPG';
 
-  document.getElementById('colorSelect1').addEventListener('change', function() {
-    selectedColor1 = this.value;
-    changeCrackColors();
+  document.querySelectorAll('input[name="colorSelect1"]').forEach(radio => {
+    radio.addEventListener('change', changeCrackColors);
   });
-
-  document.getElementById('colorSelect2').addEventListener('change', function() {
-    selectedColor2 = this.value;
-    changeCrackColors();
+  document.querySelectorAll('input[name="colorSelect2"]').forEach(radio => {
+    radio.addEventListener('change', changeCrackColors);
   });
-
-  document.getElementById('colorSelect3').addEventListener('change', function() {
-    selectedColor3 = this.value;
-    changeCrackColors();
+  document.querySelectorAll('input[name="colorSelect3"]').forEach(radio => {
+    radio.addEventListener('change', changeCrackColors);
   });
 
   function changeCrackColors() {
+    selectedColor1 = document.querySelector('input[name="colorSelect1"]:checked').value;
+    selectedColor2 = document.querySelector('input[name="colorSelect2"]:checked').value;
+    selectedColor3 = document.querySelector('input[name="colorSelect3"]:checked').value;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height); 
     ctx.drawImage(image1, 0, 0, 500, 500); 
 
