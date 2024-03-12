@@ -1,0 +1,20 @@
+<canvas id="canvas" width="500" height="500"></canvas>
+
+<script>
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+
+  var image1 = new Image();
+  var image2 = new Image();
+
+  image1.onload = function() {
+    ctx.drawImage(image1, 0, 0, 500, 500);
+    image2.src = 'arrow.png'; // Make sure this is loaded after the first image
+  };
+
+  image2.onload = function() {
+    ctx.drawImage(image2, 0, 0, 500, 500);
+  };
+
+  image1.src = 'pic.png';
+</script>
